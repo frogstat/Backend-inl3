@@ -1,9 +1,12 @@
 package se.yrgo.dataaccess;
 
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Repository;
 import se.yrgo.domain.Call;
 import se.yrgo.domain.Customer;
 import se.yrgo.services.customers.CustomerAlreadyExistsException;
@@ -13,6 +16,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
+@Repository("customerDao")
 public class CustomerDaoJdbcTemplateImpl implements CustomerDao {
 
     private static final String DELETE_SQL = "DELETE FROM CUSTOMER WHERE CUSTOMER_ID=?";
@@ -24,14 +28,11 @@ public class CustomerDaoJdbcTemplateImpl implements CustomerDao {
     private static final String ADD_CALL_SQL = "INSERT INTO CALLS(TIME_AND_DATE, NOTES, CUSTOMER_ID) VALUES (?,?,?)";
     private static final String GET_CALLS_BY_CUSTOMER_ID = "SELECT * FROM CALLS WHERE CUSTOMER_ID=?";
 
+    @Autowired
     JdbcTemplate template;
 
-    public CustomerDaoJdbcTemplateImpl(JdbcTemplate template) {
-        this.template = template;
-        createTables();
-    }
-
     @Override
+    @PostConstruct
     public void createTables() {
 
         this.template.update("""
